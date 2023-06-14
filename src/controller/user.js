@@ -16,44 +16,80 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-const buatDataUser = (req, res) => {
-    console.log(req.body);
-    res.json({
-        message: 'Berhasil Membuat Data User',
-        data: req.body
-    })
+const createNewUser = async (req, res) => {
+    const {
+        body
+    } = req;
+
+    if (!body.email || !body.username || !body.email || !body.password || !body.number || !body.address) {
+        return res.status(400).json({
+            message: 'Anda mengirimkan data yang salah',
+            data: null
+        })
+    }
+
+    try {
+        await usersModel.createNewUser(body);
+        res.status(201).json({
+            message: 'Create new user success',
+            data: body
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal Server Error',
+            serverMessage: error,
+        })
+    }
 }
 
-const updateDataUser = (req, res) => {
+const updateUser = async (req, res) => {
     const {
-        idUser
+        id
     } = req.params;
-    console.log('idUser', idUser);
-    res.json({
-        message: 'Berhasil Update Data User',
-        data: req.body,
-    })
+
+    const {
+        body
+    } = req;
+
+    try {
+        await usersModel.updateUser(body, id);
+        res.status(201).json({
+            message: 'Update user success',
+            data: {
+                id: id,
+                ...body
+            },
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal Server Error',
+            serverMessage: error,
+        })
+    }
 }
 
-const hapusDataUser = (req, res) => {
+const deleteUser = async (req, res) => {
     const {
-        idUser
+        id
     } = req.params;
-    res.json({
-        message: 'Data User Berhasil Dihapus',
-        data: {
-            // data dummy
-            id: idUser,
-            name: "Fatih",
-            email: "kopling69@gmail.com",
-            address: "Bekasi"
-        }
-    })
+
+    try {
+        await usersModel.deleteUser(id);
+        res.json({
+            message: 'User has deleted',
+            data: null
+        })
+    } catch (error) {
+        res.status(500).json({
+            message: 'Internal Server Error',
+            serverMessage: error,
+        })
+    }
 }
 
 module.exports = {
     getAllUsers,
-    buatDataUser,
-    updateDataUser,
-    hapusDataUser
+    createNewUser,
+    updateUser,
+    deleteUser
 }
